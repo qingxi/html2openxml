@@ -514,12 +514,12 @@ namespace HtmlToOpenXml
 					if (args.Cancel) return null;
 				}
 
-                // Automatic Processing or the user did not supply himself the image and did not cancel the provisioning.
-                // We download ourself the image.
-                if (iinfo == null || (iinfo.RawData == null && imageUrl.IsAbsoluteUri))
-                    iinfo = provider.DownloadData(imageUrl);
+				// Automatic Processing or the user did not supply himself the image and did not cancel the provisioning.
+				// We download ourself the image.
+				if (this.ImageProcessing != ImageProcessing.Base64Provisioning && (iinfo == null || (iinfo.RawData == null && imageUrl.IsAbsoluteUri)))
+					iinfo = provider.DownloadData(imageUrl);
 
-				if (!ImageProvisioningProvider.Provision(iinfo,imageUrl)) return null;
+				if (!ImageProvisioningProvider.Provision(iinfo, imageUrl)) return null;
 
 
 				if (this.ImageProcessing == ImageProcessing.Base64Provisioning)
@@ -558,8 +558,8 @@ namespace HtmlToOpenXml
 			}
 
 			String imagePartId = mainPart.GetIdOfPart(imagePart.Part);
-			long widthInEmus =new Unit(UnitMetric.Pixel, preferredSize.Width).ValueInEmus;
-			long heightInEmus =new Unit(UnitMetric.Pixel, preferredSize.Height).ValueInEmus;
+			long widthInEmus = new Unit(UnitMetric.Pixel, preferredSize.Width).ValueInEmus;
+			long heightInEmus = new Unit(UnitMetric.Pixel, preferredSize.Height).ValueInEmus;
 
 			++drawingObjId;
 			++imageObjId;
@@ -569,13 +569,15 @@ namespace HtmlToOpenXml
 					new wp.Extent() { Cx = widthInEmus, Cy = heightInEmus },
 					new wp.EffectExtent() { LeftEdge = 19050L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L },
 					new wp.DocProperties() { Id = drawingObjId, Name = imageSource, Description = String.Empty },
-					new wp.NonVisualGraphicFrameDrawingProperties {
+					new wp.NonVisualGraphicFrameDrawingProperties
+					{
 						GraphicFrameLocks = new a.GraphicFrameLocks() { NoChangeAspect = true }
 					},
 					new a.Graphic(
 						new a.GraphicData(
 							new pic.Picture(
-								new pic.NonVisualPictureProperties {
+								new pic.NonVisualPictureProperties
+								{
 									NonVisualDrawingProperties = new pic.NonVisualDrawingProperties() { Id = imageObjId, Name = imageSource, Description = alt },
 									NonVisualPictureDrawingProperties = new pic.NonVisualPictureDrawingProperties(
 										new a.PictureLocks() { NoChangeAspect = true, NoChangeArrowheads = true })
@@ -591,10 +593,14 @@ namespace HtmlToOpenXml
 										new a.Extents() { Cx = widthInEmus, Cy = heightInEmus }),
 									new a.PresetGeometry(
 										new a.AdjustValueList()
-									) { Preset = a.ShapeTypeValues.Rectangle }
-								) { BlackWhiteMode = a.BlackWhiteModeValues.Auto })
-						) { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" })
-				) { DistanceFromTop = (UInt32Value) 0U, DistanceFromBottom = (UInt32Value) 0U, DistanceFromLeft = (UInt32Value) 0U, DistanceFromRight = (UInt32Value) 0U }
+									)
+									{ Preset = a.ShapeTypeValues.Rectangle }
+								)
+								{ BlackWhiteMode = a.BlackWhiteModeValues.Auto })
+						)
+						{ Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" })
+				)
+				{ DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U }
 			);
 
 			return img;
