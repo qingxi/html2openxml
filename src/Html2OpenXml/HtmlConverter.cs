@@ -502,17 +502,26 @@ namespace HtmlToOpenXml
 				ImageProvisioningProvider provider = new ImageProvisioningProvider(this.WebProxy, preferredSize);
 
 				if (imageUrl == null)
-                    iinfo = provider.DownloadData(DataUri.Parse(imageSource));
-                else if (this.ImageProcessing == ImageProcessing.ManualProvisioning)
-                {
-                    // as HtmlImageInfo is a class, the EventArgs will act as a proxy
-                    iinfo = new HtmlImageInfo() { Size = preferredSize };
-                    ProvisionImageEventArgs args = new ProvisionImageEventArgs(imageUrl, iinfo);
-                    OnProvisionImage(args);
+					iinfo = provider.DownloadData(DataUri.Parse(imageSource));
+				else if (this.ImageProcessing == ImageProcessing.ManualProvisioning)
+				{
+					// as HtmlImageInfo is a class, the EventArgs will act as a proxy
+					iinfo = new HtmlImageInfo() { Size = preferredSize };
+					ProvisionImageEventArgs args = new ProvisionImageEventArgs(imageUrl, iinfo);
+					OnProvisionImage(args);
 
-                    // did the user want to ignore this image?
-                    if (args.Cancel) return null;
-                }
+					// did the user want to ignore this image?
+					if (args.Cancel) return null;
+				}
+				
+				if (this.ImageProcessing == ImageProcessing.Base64Provisioning)
+				{
+					if (iinfo == null) return null;
+					ProvisionImageEventArgs args = new ProvisionImageEventArgs(imageUrl, iinfo);
+					OnProvisionImage(args);
+					// did the user want to ignore this image?
+					if (args.Cancel) return null;
+				}
 
                 // Automatic Processing or the user did not supply himself the image and did not cancel the provisioning.
                 // We download ourself the image.

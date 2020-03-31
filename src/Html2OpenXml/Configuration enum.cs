@@ -48,7 +48,11 @@ namespace HtmlToOpenXml
         /// <summary>
         /// The image data will be provided by calling the <see cref="HtmlConverter.ProvisionImage"/> event.
         /// </summary>
-        ManualProvisioning
+        ManualProvisioning,
+        /// <summary>
+        /// The image data will be provided by calling the <see cref="HtmlConverter.ProvisionImage"/> event.
+        /// </summary>
+        Base64Provisioning,
     }
 
     /// <summary>
