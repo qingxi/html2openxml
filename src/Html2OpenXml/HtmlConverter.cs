@@ -624,6 +624,8 @@ namespace HtmlToOpenXml
                 { "<blockquote>", ProcessBlockQuote },
 				{ "<body>", ProcessBody },
 				{ "<br>", ProcessBr },
+				{ "<br />", Process2Br },
+				{ "<br/>", Process2Br },
 				{ "<caption>", ProcessTableCaption },
 				{ "<cite>", ProcessCite },
 				{ "<del>", ProcessHtmlElement<Strike> },

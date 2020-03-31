@@ -156,6 +156,12 @@ namespace HtmlToOpenXml
 			elements.Add(new Run(new Break()));
 		}
 
+		private void Process2Br(HtmlEnumerator en)
+		{
+			elements.Add(new Run(new Break()));
+			elements.Add(new Run(new Break()));
+		}
+
 		#endregion
 
 		#region ProcessCite
