@@ -868,29 +868,29 @@ namespace HtmlToOpenXml
 				// the margin part has been implemented by Olek (patch #8457)
 
 				TableCellMarginDefault cellMargin = new TableCellMarginDefault();
-                if (margin.Left.IsFixed)
-					cellMargin.TableCellLeftMargin = new TableCellLeftMargin() { Type = TableWidthValues.Dxa, Width = (short) margin.Left.ValueInDxa };
-                if (margin.Right.IsFixed)
-					cellMargin.TableCellRightMargin = new TableCellRightMargin() { Type = TableWidthValues.Dxa, Width = (short) margin.Right.ValueInDxa };
-                if (margin.Top.IsFixed)
+				if (margin.Left.IsFixed)
+					cellMargin.TableCellLeftMargin = new TableCellLeftMargin() { Type = TableWidthValues.Dxa, Width = (short)margin.Left.ValueInDxa };
+				if (margin.Right.IsFixed)
+					cellMargin.TableCellRightMargin = new TableCellRightMargin() { Type = TableWidthValues.Dxa, Width = (short)margin.Right.ValueInDxa };
+				if (margin.Top.IsFixed)
 					cellMargin.TopMargin = new TopMargin() { Type = TableWidthUnitValues.Dxa, Width = margin.Top.ValueInDxa.ToString(CultureInfo.InvariantCulture) };
-                if (margin.Bottom.IsFixed)
+				if (margin.Bottom.IsFixed)
 					cellMargin.BottomMargin = new BottomMargin() { Type = TableWidthUnitValues.Dxa, Width = margin.Bottom.ValueInDxa.ToString(CultureInfo.InvariantCulture) };
 
-                // Align table according to the margin 'auto' as it stands in Html
-                if (margin.Left.Type == UnitMetric.Auto || margin.Right.Type == UnitMetric.Auto)
-                {
-                    TableRowAlignmentValues justification;
+				// Align table according to the margin 'auto' as it stands in Html
+				if (margin.Left.Type == UnitMetric.Auto || margin.Right.Type == UnitMetric.Auto)
+				{
+					TableRowAlignmentValues justification;
 
-                    if (margin.Left.Type == UnitMetric.Auto && margin.Right.Type == UnitMetric.Auto)
-                        justification = TableRowAlignmentValues.Center;
-                    else if (margin.Left.Type == UnitMetric.Auto)
-                        justification = TableRowAlignmentValues.Right;
-                    else
-                        justification = TableRowAlignmentValues.Left;
+					if (margin.Left.Type == UnitMetric.Auto && margin.Right.Type == UnitMetric.Auto)
+						justification = TableRowAlignmentValues.Center;
+					else if (margin.Left.Type == UnitMetric.Auto)
+						justification = TableRowAlignmentValues.Right;
+					else
+						justification = TableRowAlignmentValues.Left;
 
-                    properties.TableJustification = new TableJustification() { Val = justification };
-                }
+					properties.TableJustification = new TableJustification() { Val = justification };
+				}
 
 				if (cellMargin.HasChildren)
 					properties.TableCellMarginDefault = cellMargin;
@@ -901,7 +901,9 @@ namespace HtmlToOpenXml
                 properties.TableCellSpacing = new TableCellSpacing { Type = TableWidthUnitValues.Dxa, Width = new Unit(UnitMetric.Pixel, spacing.Value).ValueInDxa.ToString(CultureInfo.InvariantCulture) };
 
 			int? padding = en.Attributes.GetAsInt("cellpadding");
-            if (padding.HasValue)
+			//set default padding
+			padding = padding ?? 0;
+			if (padding.HasValue)
             {
                 int paddingDxa = (int) new Unit(UnitMetric.Pixel, padding.Value).ValueInDxa;
 
@@ -1043,8 +1045,8 @@ namespace HtmlToOpenXml
 			if (!tables.HasContext) return;
 
 			TableCellProperties properties = new TableCellProperties();
-            // in Html, table cell are vertically centered by default
-            properties.TableCellVerticalAlignment = new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center };
+			// in Html, table cell are vertically centered by default
+			properties.TableCellVerticalAlignment = new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center };
 
 			List<OpenXmlElement> styleAttributes = new List<OpenXmlElement>();
 			List<OpenXmlElement> runStyleAttributes = new List<OpenXmlElement>();

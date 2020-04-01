@@ -11,11 +11,11 @@ namespace ConsoleApp1
     class Program
     {
         private static readonly int word_max_width = 560;
-        private static readonly int word_max_height = 878;
+        private static readonly int word_max_height = 860;
         static void Main(string[] args)
         {
 
-            string html = File.ReadAllText(@"C:\Others\Work\git\html2openxml\test - Copy.html");
+            string html = File.ReadAllText(@"C:\Users\shisx\Source\Repos\html2openxml\test1.html");
             using (MemoryStream generatedDocument = new MemoryStream())
             {
                 using (WordprocessingDocument package = WordprocessingDocument.Create(generatedDocument, WordprocessingDocumentType.Document))
@@ -60,7 +60,7 @@ namespace ConsoleApp1
                     }
                     mainPart.Document.Save();
                 }
-                File.WriteAllBytes(@"C:\Others\Work\git\html2openxml\test.docx", generatedDocument.ToArray());
+                File.WriteAllBytes(@"C:\Users\shisx\Source\Repos\html2openxml\test1.docx", generatedDocument.ToArray());
             }
         }
     }

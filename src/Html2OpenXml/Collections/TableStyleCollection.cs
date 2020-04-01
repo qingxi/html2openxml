@@ -102,7 +102,8 @@ namespace HtmlToOpenXml
 			}
 
 			var htmlAlign = en.StyleAttributes["vertical-align"];
-			if (htmlAlign == null) htmlAlign = en.Attributes["valign"];
+			if (htmlAlign == null) 
+				//htmlAlign = en.Attributes["valign"];
 			if (htmlAlign != null)
 			{
 				TableVerticalAlignmentValues? valign = Converter.ToVAlign(htmlAlign);

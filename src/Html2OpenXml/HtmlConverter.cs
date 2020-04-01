@@ -513,10 +513,14 @@ namespace HtmlToOpenXml
 					// did the user want to ignore this image?
 					if (args.Cancel) return null;
 				}
+				else if (this.ImageProcessing == ImageProcessing.Base64Provisioning)
+				{
+					iinfo = new HtmlImageInfo() { Size = preferredSize };
+				}
 
 				// Automatic Processing or the user did not supply himself the image and did not cancel the provisioning.
 				// We download ourself the image.
-				if (this.ImageProcessing != ImageProcessing.Base64Provisioning && (iinfo == null || (iinfo.RawData == null && imageUrl.IsAbsoluteUri)))
+				if (iinfo == null || (iinfo.RawData == null && imageUrl.IsAbsoluteUri))
 					iinfo = provider.DownloadData(imageUrl);
 
 				if (!ImageProvisioningProvider.Provision(iinfo, imageUrl)) return null;
