@@ -628,8 +628,8 @@ namespace HtmlToOpenXml
                 { "<blockquote>", ProcessBlockQuote },
 				{ "<body>", ProcessBody },
 				{ "<br>", ProcessBr },
-				{ "<br />", Process2Br },
-				{ "<br/>", Process2Br },
+				{ "<br />", ProcessBr },
+				{ "<br/>", ProcessBr },
 				{ "<caption>", ProcessTableCaption },
 				{ "<cite>", ProcessCite },
 				{ "<del>", ProcessHtmlElement<Strike> },
@@ -792,6 +792,20 @@ namespace HtmlToOpenXml
 			return newParagraph;
 		}
 
+		#endregion
+		#region ChangePageMargin
+		private static SectionProperties ChangePageMargin(Margin margin)
+		{
+			var pageMargin = new PageMargin()
+			{
+				Top = (int)margin.Top.ValueInDxa,
+				Right = (uint)margin.Right.ValueInDxa,
+				Bottom = (int)margin.Bottom.ValueInDxa,
+				Left = (uint)margin.Left.ValueInDxa
+			};
+
+			return new SectionProperties(pageMargin);
+		}
 		#endregion
 
 		#region ChangePageOrientation

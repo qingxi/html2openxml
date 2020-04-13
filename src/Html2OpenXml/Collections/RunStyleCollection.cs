@@ -25,12 +25,10 @@ namespace HtmlToOpenXml
 		private HtmlDocumentStyle documentStyle;
 		private readonly static GetSequenceNumberHandler getTagOrderHandler = CreateTagOrderDelegate<RunProperties>();
 
-
 		internal RunStyleCollection(HtmlDocumentStyle documentStyle)
 		{
 			this.documentStyle = documentStyle;
 		}
-
 		/// <summary>
 		/// Apply all the current Html tag (Run properties) to the specified run.
 		/// </summary>
@@ -58,10 +56,21 @@ namespace HtmlToOpenXml
 		/// <summary>
 		/// Converts some common styling attributes to their OpenXml equivalence.
 		/// </summary>
-        /// <param name="en">The Html parser.</param>
+		/// <param name="en">The Html parser.</param>
 		/// <param name="styleAttributes">The collection of attributes where to store new discovered attributes.</param>
 		public void ProcessCommonAttributes(HtmlEnumerator en, IList<OpenXmlElement> styleAttributes)
 		{
+
+			if (DefaultFontSize != null)
+			{
+				styleAttributes.Add(DefaultFontSize);
+			}
+
+			if (DefaultRunFonts != null)
+			{
+				styleAttributes.Add(DefaultRunFonts);
+			}
+
 			if (en.Attributes.Count == 0) return;
 
 			var colorValue = en.StyleAttributes.GetAsColor("color");
@@ -117,7 +126,7 @@ namespace HtmlToOpenXml
 					styleAttributes.Add(new RunFonts() { Ascii = font.Family, HighAnsi = font.Family });
 
 				// size are half-point font size
-                if (font.Size.IsFixed)
+				if (font.Size.IsFixed)
 					styleAttributes.Add(new FontSize() { Val = (font.Size.ValueInPoint * 2).ToString(CultureInfo.InvariantCulture) });
 			}
 		}

@@ -85,6 +85,7 @@ namespace HtmlToOpenXml
 				case "x-large": return new Unit(UnitMetric.Point, 48);
 				case "7":
 				case "xx-large": return new Unit(UnitMetric.Point, 72);
+				case "9": return new Unit(UnitMetric.Point, 9);
 				default:
 					// the font-size is specified in positive half-points
 					Unit unit = Unit.Parse(htmlSize);

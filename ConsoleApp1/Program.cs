@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using HtmlToOpenXml;
 using DocumentFormat.OpenXml.Wordprocessing;
-
+using System.Linq;
 
 namespace ConsoleApp1
 {
@@ -12,10 +12,17 @@ namespace ConsoleApp1
     {
         private static readonly int word_max_width = 560;
         private static readonly int word_max_height = 860;
+
         static void Main(string[] args)
         {
-
-            string html = File.ReadAllText(@"C:\Users\shisx\Source\Repos\html2openxml\test1.html");
+            var rootPath = @"C:\Others\Work\git\html2openxml";
+            var htmlPath = Path.Combine(rootPath, "test1.html");
+            var wordPath = Path.Combine(rootPath, "test1.docx");
+            if (File.Exists(wordPath))
+            {
+                File.Delete(wordPath);
+            }
+            string html = File.ReadAllText(htmlPath);
             using (MemoryStream generatedDocument = new MemoryStream())
             {
                 using (WordprocessingDocument package = WordprocessingDocument.Create(generatedDocument, WordprocessingDocumentType.Document))
@@ -24,7 +31,6 @@ namespace ConsoleApp1
                     if (mainPart == null)
                     {
                         mainPart = package.AddMainDocumentPart();
-                        new Document(new Body()).Save(mainPart);
                     }
                     HtmlConverter converter = new HtmlConverter(mainPart);
                     converter.ImageProcessing = ImageProcessing.Base64Provisioning;
@@ -51,16 +57,16 @@ namespace ConsoleApp1
                     };
                     converter.ConsiderDivAsParagraph = true;
                     converter.RenderPreAsTable = true;
-                    Body body = mainPart.Document.Body;
-
-                    var paragraphs = converter.Parse(html);
-                    for (int i = 0; i < paragraphs.Count; i++)
-                    {
-                        body.Append(paragraphs[i]);
-                    }
-                    mainPart.Document.Save();
+                    converter.ParseHtml(html);
                 }
-                File.WriteAllBytes(@"C:\Users\shisx\Source\Repos\html2openxml\test1.docx", generatedDocument.ToArray());
+                File.WriteAllBytes(wordPath, generatedDocument.ToArray());
+
+                //using (WordprocessingDocument package = WordprocessingDocument.Open(Path.Combine(rootPath, "test2.docx"), true))
+                //{
+                //    Run r = package.MainDocumentPart.Document.Descendants<Run>().First();
+                //    r.PrependChild<RunProperties>(new RunProperties(new RunFonts { Ascii= "Meiryo" }));
+                //    package.MainDocumentPart.Document.Save();
+                //}
             }
         }
     }

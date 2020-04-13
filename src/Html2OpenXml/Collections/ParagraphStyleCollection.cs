@@ -74,6 +74,16 @@ namespace HtmlToOpenXml
 		/// <returns>Returns true if the processing of this tag should generate a new paragraph.</returns>
 		public bool ProcessCommonAttributes(HtmlEnumerator en, IList<OpenXmlElement> styleAttributes)
 		{
+			if (DefaultFontSize != null)
+			{
+				styleAttributes.Add(DefaultFontSize);
+			}
+
+			if (DefaultRunFonts != null)
+			{
+				styleAttributes.Add(DefaultRunFonts);
+			}
+
 			if (en.Attributes.Count == 0) return false;
 
 			bool newParagraph = false;

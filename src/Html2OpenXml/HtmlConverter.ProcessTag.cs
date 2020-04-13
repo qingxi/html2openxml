@@ -117,6 +117,11 @@ namespace HtmlToOpenXml
 		private void ProcessBody(HtmlEnumerator en)
 		{
 			List<OpenXmlElement> styleAttributes = new List<OpenXmlElement>();
+			int fontSize = en.StyleAttributes.GetAsInt("font-size").GetValueOrDefault(0);
+			string fontName = en.StyleAttributes["font-name"];
+			htmlStyles.Paragraph.ApplyFontStyle(fontSize, fontName);
+			htmlStyles.Tables.ApplyFontStyle(fontSize, fontName);
+			htmlStyles.Runs.ApplyFontStyle(fontSize, fontName);
 			htmlStyles.Paragraph.ProcessCommonAttributes(en, styleAttributes);
 
 			if (styleAttributes.Count > 0)
@@ -129,22 +134,38 @@ namespace HtmlToOpenXml
 			{
 				PageOrientationValues orientation = Converter.ToPageOrientation(attr);
 
-                SectionProperties sectionProperties = mainPart.Document.Body.GetFirstChild<SectionProperties>();
-                if (sectionProperties == null || sectionProperties.GetFirstChild<PageSize>() == null)
-                {
-                    mainPart.Document.Body.Append(HtmlConverter.ChangePageOrientation(orientation));
-                }
-                else
-                {
-                    PageSize pageSize = sectionProperties.GetFirstChild<PageSize>();
-                    if (!pageSize.Compare(orientation))
-                    {
-                        SectionProperties validSectionProp = ChangePageOrientation(orientation);
-                        if (pageSize != null) pageSize.Remove();
-                        sectionProperties.PrependChild(validSectionProp.GetFirstChild<PageSize>().CloneNode(true));
-                    }
-                }
-            }
+				SectionProperties sectionProperties = mainPart.Document.Body.GetFirstChild<SectionProperties>();
+				if (sectionProperties == null || sectionProperties.GetFirstChild<PageSize>() == null)
+				{
+					mainPart.Document.Body.Append(HtmlConverter.ChangePageOrientation(orientation));
+				}
+				else
+				{
+					PageSize pageSize = sectionProperties.GetFirstChild<PageSize>();
+					if (!pageSize.Compare(orientation))
+					{
+						SectionProperties validSectionProp = ChangePageOrientation(orientation);
+						if (pageSize != null) pageSize.Remove();
+						sectionProperties.PrependChild(validSectionProp.GetFirstChild<PageSize>().CloneNode(true));
+					}
+				}
+			}
+			var marginAttr = en.StyleAttributes.GetAsMargin("page-margin");
+			if (!marginAttr.IsEmpty)
+			{
+				SectionProperties sectionProperties = mainPart.Document.Body.GetFirstChild<SectionProperties>();
+				if (sectionProperties == null || sectionProperties.GetFirstChild<PageMargin>() == null)
+				{
+					mainPart.Document.Body.Append(HtmlConverter.ChangePageMargin(marginAttr));
+				}
+				else
+				{
+					PageMargin pageMargin = sectionProperties.GetFirstChild<PageMargin>();
+					SectionProperties validSectionProp = ChangePageMargin(marginAttr);
+					if (pageMargin != null) pageMargin.Remove();
+					sectionProperties.PrependChild(validSectionProp.GetFirstChild<PageMargin>().CloneNode(true));
+				}
+			}
 		}
 
 		#endregion
@@ -847,7 +868,7 @@ namespace HtmlToOpenXml
 			{
 				// Use Auto=0 instead of Pct=auto
 				// bug reported by scarhand (https://html2openxml.codeplex.com/workitem/12494)
-				properties.TableWidth = new TableWidth() { Type = TableWidthUnitValues.Auto, Width = "0" };
+				properties.TableWidth = new TableWidth() { Type = TableWidthUnitValues.Pct, Width = "5000" };
 			}
 
 			string align = en.Attributes["align"];

@@ -18,13 +18,23 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace HtmlToOpenXml
 {
-	using TagsAtSameLevel = System.ArraySegment<DocumentFormat.OpenXml.OpenXmlElement>;
+    using TagsAtSameLevel = System.ArraySegment<DocumentFormat.OpenXml.OpenXmlElement>;
 
     /// <summary>
     /// Defines the styles to apply on OpenXml elements.
     /// </summary>
     abstract class OpenXmlStyleCollectionBase
     {
+        /// <summary>
+        /// Get DefaultFontSize in body attribute.
+        /// </summary>
+        protected FontSize DefaultFontSize { get; private set; }
+
+        /// <summary>
+        /// Get DefaultFontSize in body attribute.
+        /// </summary>
+        protected RunFonts DefaultRunFonts { get; private set; }
+
         /// <summary>
         /// Handler to retrieves the insert order of a child inside its parent element.
         /// </summary>
@@ -216,7 +226,7 @@ namespace HtmlToOpenXml
                 containerProperties.InsertAfter(tag, openXmlElement);
         }
 
-#endregion
+        #endregion
 
         #region GetTagOrder
 
@@ -239,7 +249,7 @@ namespace HtmlToOpenXml
 
             // We use a dummy new RunProperties instance
             // Create a delegate to speed up the invocation to the GetSequenceNumber method
-            return (GetSequenceNumberHandler) mi.CreateDelegate(typeof(GetSequenceNumberHandler), new T());
+            return (GetSequenceNumberHandler)mi.CreateDelegate(typeof(GetSequenceNumberHandler), new T());
 #endif
         }
 
@@ -251,5 +261,17 @@ namespace HtmlToOpenXml
         /// <param name="element">The child item to look up.</param>
         /// <returns>Returns the order of the child.</returns>
         protected abstract int GetTagOrder(OpenXmlElement element);
+
+        public void ApplyFontStyle(int fontsize, string fontName)
+        {
+            if (fontsize > 0)
+            {
+                DefaultFontSize = new FontSize { Val = fontsize.ToString() };
+            }
+            if (!string.IsNullOrEmpty(fontName))
+            {
+                DefaultRunFonts = new RunFonts { Ascii = fontName, HighAnsi = fontName, EastAsia = fontName };
+            }
+        }
     }
 }

@@ -110,6 +110,7 @@ namespace HtmlToOpenXml
 				if (valign.HasValue)
 					containerStyleAttributes.Add(new TableCellVerticalAlignment() { Val = valign });
 			}
+			
 
 			htmlAlign = en.StyleAttributes["text-align"];
 			if (htmlAlign == null) htmlAlign = en.Attributes["align"];
@@ -136,7 +137,6 @@ namespace HtmlToOpenXml
 			}
 
 			this.BeginTag(en.CurrentTag, containerStyleAttributes);
-
 			// Process general run styles
 			documentStyle.Runs.ProcessCommonAttributes(en, runStyleAttributes);
 		}
