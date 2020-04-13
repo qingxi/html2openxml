@@ -23,10 +23,11 @@ namespace HtmlToOpenXml
 	{
 		private ParagraphStyleCollection paragraphStyle;
 		private HtmlDocumentStyle documentStyle;
-        private readonly static GetSequenceNumberHandler getTagOrderHandler = CreateTagOrderDelegate<TableProperties>();
+		private readonly static GetSequenceNumberHandler getTagOrderHandler = CreateTagOrderDelegate<TableProperties>();
 
+		public int DefaultBorder { get; private set; }
 
-        internal TableStyleCollection(HtmlDocumentStyle documentStyle)
+		internal TableStyleCollection(HtmlDocumentStyle documentStyle)
 		{
 			this.documentStyle = documentStyle;
 			paragraphStyle = new ParagraphStyleCollection(documentStyle);
@@ -90,30 +91,31 @@ namespace HtmlToOpenXml
 
 			var colorValue = en.StyleAttributes.GetAsColor("background-color");
 
-            // "background-color" is also handled by RunStyleCollection which duplicate this attribute (bug #13212). 
+			// "background-color" is also handled by RunStyleCollection which duplicate this attribute (bug #13212). 
 			// Also apply on <th> (issue #20).
 			// As on 05 Jan 2018, the duplication was due to the wrong argument passed during the td/th processing.
 			// It was the runStyle and not the containerStyle that was provided. The code has been removed as no more useful
 			if (colorValue.IsEmpty) colorValue = en.Attributes.GetAsColor("bgcolor");
-            if (!colorValue.IsEmpty)
+			if (!colorValue.IsEmpty)
 			{
 				containerStyleAttributes.Add(
 					new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = colorValue.ToHexString() });
 			}
 
 			var htmlAlign = en.StyleAttributes["vertical-align"];
-			if (htmlAlign == null) 
+			if (htmlAlign == null)
 				//htmlAlign = en.Attributes["valign"];
-			if (htmlAlign != null)
-			{
-				TableVerticalAlignmentValues? valign = Converter.ToVAlign(htmlAlign);
-				if (valign.HasValue)
-					containerStyleAttributes.Add(new TableCellVerticalAlignment() { Val = valign });
-			}
-			
+				if (htmlAlign != null)
+				{
+					TableVerticalAlignmentValues? valign = Converter.ToVAlign(htmlAlign);
+					if (valign.HasValue)
+						containerStyleAttributes.Add(new TableCellVerticalAlignment() { Val = valign });
+				}
+
 
 			htmlAlign = en.StyleAttributes["text-align"];
 			if (htmlAlign == null) htmlAlign = en.Attributes["align"];
+			if (htmlAlign == null) htmlAlign = documentStyle.Tables.DefaultTextAlign;
 			if (htmlAlign != null)
 			{
 				JustificationValues? halign = Converter.ToParagraphAlign(htmlAlign);
@@ -147,9 +149,15 @@ namespace HtmlToOpenXml
 
 		protected override int GetTagOrder(OpenXmlElement element)
 		{
-			return (int) getTagOrderHandler.DynamicInvoke(element);
+			return (int)getTagOrderHandler.DynamicInvoke(element);
 		}
 
 		#endregion
+
+
+		public void ApplyDefaultBorder(int border)
+		{
+			DefaultBorder = border;
+		}
 	}
 }

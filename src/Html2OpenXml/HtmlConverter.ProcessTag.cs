@@ -119,9 +119,12 @@ namespace HtmlToOpenXml
 			List<OpenXmlElement> styleAttributes = new List<OpenXmlElement>();
 			int fontSize = en.StyleAttributes.GetAsInt("font-size").GetValueOrDefault(0);
 			string fontName = en.StyleAttributes["font-name"];
-			htmlStyles.Paragraph.ApplyFontStyle(fontSize, fontName);
-			htmlStyles.Tables.ApplyFontStyle(fontSize, fontName);
-			htmlStyles.Runs.ApplyFontStyle(fontSize, fontName);
+			string textAlign = en.StyleAttributes["text-align"];
+			int tableBorder = en.StyleAttributes.GetAsInt("table-border").GetValueOrDefault(0);
+			htmlStyles.Paragraph.ApplyFontStyle(fontSize, fontName, textAlign);
+			htmlStyles.Tables.ApplyFontStyle(fontSize, fontName, textAlign);
+			htmlStyles.Tables.ApplyDefaultBorder(tableBorder);
+			htmlStyles.Runs.ApplyFontStyle(fontSize, fontName, textAlign);
 			htmlStyles.Paragraph.ProcessCommonAttributes(en, styleAttributes);
 
 			if (styleAttributes.Count > 0)
@@ -807,6 +810,8 @@ namespace HtmlToOpenXml
 			}
 
 			int? border = en.Attributes.GetAsInt("border");
+			border = border.GetValueOrDefault(htmlStyles.Tables.DefaultBorder);
+			border = border > 0 ? border : htmlStyles.Tables.DefaultBorder;
 			if (border.HasValue && border.Value > 0)
 			{
 				bool handleBorders = true;
@@ -1370,35 +1375,40 @@ namespace HtmlToOpenXml
 					HtmlTableSpan tspan = tables.RowSpan[i];
 					if (tspan.CellOrigin.Row == rowIndex) continue;
 
-                    TableCell emptyCell = new TableCell(new TableCellProperties {
-								            TableCellWidth = new TableCellWidth() { Width = "0" },
-								            VerticalMerge = new VerticalMerge() },
-							            new Paragraph());
+					TableCell emptyCell = new TableCell(new TableCellProperties
+					{
+						TableCellWidth = new TableCellWidth() { Width = "0" },
+						VerticalMerge = new VerticalMerge()
+					},
+										new Paragraph());
 
-                    tspan.RowSpan--;
-                    if (tspan.RowSpan == 0) { tables.RowSpan.RemoveAt(i); i--; }
+					tspan.RowSpan--;
+					if (tspan.RowSpan == 0) { tables.RowSpan.RemoveAt(i); i--; }
 
-                    // in case of both colSpan + rowSpan on the same cell, we have to reverberate the rowSpan on the next columns too
-                    if (tspan.ColSpan > 0) emptyCell.TableCellProperties.GridSpan = new GridSpan() { Val = tspan.ColSpan };
+					// in case of both colSpan + rowSpan on the same cell, we have to reverberate the rowSpan on the next columns too
+					if (tspan.ColSpan > 0) emptyCell.TableCellProperties.GridSpan = new GridSpan() { Val = tspan.ColSpan };
 
-                    TableCell cell = row.GetFirstChild<TableCell>();
-                    if (tspan.CellOrigin.Column == 0 || cell == null)
-                    {
-                        row.InsertAt(emptyCell, 0);
-                        continue;
-                    }
+					TableCell cell = row.GetFirstChild<TableCell>();
+					if (tspan.CellOrigin.Column == 0 || cell == null)
+					{
+						row.InsertAt(emptyCell, 0);
+						continue;
+					}
 
-                    // find the good column position, taking care of eventual colSpan
-                    int columnIndex = 0;
-                    while (columnIndex < tspan.CellOrigin.Column)
-                    {
-                        columnIndex += cell.TableCellProperties?.GridSpan?.Val ?? 1;
-                    }
-                    //while ((cell = cell.NextSibling<TableCell>()) != null);
-
-                    if (cell == null) row.AppendChild(emptyCell);
-                    else row.InsertAfter<TableCell>(emptyCell, cell);
-                }
+					// find the good column position, taking care of eventual colSpan
+					int columnIndex = 0;
+					while (columnIndex < tspan.CellOrigin.Column)
+					{
+						columnIndex += cell.TableCellProperties?.GridSpan?.Val ?? 1;
+					}
+					//while ((cell = cell.NextSibling<TableCell>()) != null);
+					if (columnIndex > 0 && row.ChildElements.Count >= columnIndex)
+					{
+						cell = row.ChildElements[columnIndex - 1] as TableCell;
+					}
+					if (cell == null) row.AppendChild(emptyCell);
+					else row.InsertAfter(emptyCell, cell);
+				}
 			}
 
 			htmlStyles.Tables.EndTag("<tr>");

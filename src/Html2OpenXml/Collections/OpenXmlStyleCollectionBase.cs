@@ -35,6 +35,8 @@ namespace HtmlToOpenXml
         /// </summary>
         protected RunFonts DefaultRunFonts { get; private set; }
 
+        protected string DefaultTextAlign { get; private set; }
+
         /// <summary>
         /// Handler to retrieves the insert order of a child inside its parent element.
         /// </summary>
@@ -262,8 +264,9 @@ namespace HtmlToOpenXml
         /// <returns>Returns the order of the child.</returns>
         protected abstract int GetTagOrder(OpenXmlElement element);
 
-        public void ApplyFontStyle(int fontsize, string fontName)
+        public void ApplyFontStyle(int fontsize, string fontName,string textAlign)
         {
+            DefaultTextAlign = textAlign ?? "left";
             if (fontsize > 0)
             {
                 DefaultFontSize = new FontSize { Val = fontsize.ToString() };
