@@ -21,12 +21,9 @@ namespace HtmlToOpenXml
 
 	sealed class TableStyleCollection : OpenXmlStyleCollectionBase
 	{
-		private ParagraphStyleCollection paragraphStyle;
-		private HtmlDocumentStyle documentStyle;
-		private readonly static GetSequenceNumberHandler getTagOrderHandler = CreateTagOrderDelegate<TableProperties>();
-
+		private readonly ParagraphStyleCollection paragraphStyle;
+		private readonly HtmlDocumentStyle documentStyle;
 		public int DefaultBorder { get; private set; }
-
 		internal TableStyleCollection(HtmlDocumentStyle documentStyle)
 		{
 			this.documentStyle = documentStyle;
@@ -142,22 +139,11 @@ namespace HtmlToOpenXml
 			// Process general run styles
 			documentStyle.Runs.ProcessCommonAttributes(en, runStyleAttributes);
 		}
-
-		#endregion
-
-		#region GetTagOrder
-
-		protected override int GetTagOrder(OpenXmlElement element)
-		{
-			return (int)getTagOrderHandler.DynamicInvoke(element);
-		}
-
-		#endregion
-
-
+		
 		public void ApplyDefaultBorder(int border)
 		{
 			DefaultBorder = border;
 		}
+		#endregion
 	}
 }
