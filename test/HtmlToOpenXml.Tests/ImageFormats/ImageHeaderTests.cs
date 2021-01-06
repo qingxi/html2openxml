@@ -1,6 +1,5 @@
-using System.Linq;
+using HtmlToOpenXml.IO;
 using NUnit.Framework;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace HtmlToOpenXml.Tests
 {
@@ -52,14 +51,19 @@ namespace HtmlToOpenXml.Tests
             }
         }
 
-        [Test]
-        public void ReadSizeEmf()
+        [TestCase("Resources.html2openxml.bmp", IO.ImageHeader.FileType.Bitmap)]
+        [TestCase("Resources.html2openxml.gif", IO.ImageHeader.FileType.Gif)]
+        [TestCase("Resources.html2openxml.jpg", IO.ImageHeader.FileType.Jpeg)]
+        [TestCase("Resources.html2openxml.png", IO.ImageHeader.FileType.Png)]
+        public void DetectFileType(string resourceName, IO.ImageHeader.FileType type)
         {
-            using (var imageStream = ResourceHelper.GetStream("Resources.html2openxml.emf"))
+            using (var imageStream = ResourceHelper.GetStream(resourceName))
             {
-                Size size = ImageHeader.GetDimensions(imageStream);
-                Assert.That(size.Width, Is.EqualTo(252));
-                Assert.That(size.Height, Is.EqualTo(318));
+                IO.ImageHeader.FileType guessType;
+                bool success = IO.ImageHeader.TryDetectFileType(imageStream, out guessType);
+
+                Assert.That(success, Is.EqualTo(true));
+                Assert.That(guessType, Is.EqualTo(type));
             }
         }
     }

@@ -21,8 +21,11 @@ namespace Demo
             {
                 // Uncomment and comment the second using() to open an existing template document
                 // instead of creating it from scratch.
+                using (var buffer = ResourceHelper.GetStream("Resources.template.docx"))
+                {
+                    buffer.CopyTo(generatedDocument);
+                }
 
-                using (var buffer = ResourceHelper.GetStream("Resources.template.docx")) buffer.CopyToAsync(generatedDocument);
                 generatedDocument.Position = 0L;
                 using (WordprocessingDocument package = WordprocessingDocument.Open(generatedDocument, true))
                 //using (WordprocessingDocument package = WordprocessingDocument.Create(generatedDocument, WordprocessingDocumentType.Document))
@@ -35,11 +38,6 @@ namespace Demo
                     }
 
                     HtmlConverter converter = new HtmlConverter(mainPart);
-                    //converter.WebProxy.Credentials = new System.Net.NetworkCredential("nizeto", "****", "domain");
-                    //converter.WebProxy.Proxy = new System.Net.WebProxy("proxy01:8080");
-                    converter.ImageProcessing = ImageProcessing.ManualProvisioning;
-                    converter.ProvisionImage += OnProvisionImage;
-
                     Body body = mainPart.Document.Body;
 
                     converter.ParseHtml(html);
@@ -52,18 +50,6 @@ namespace Demo
             }
 
             System.Diagnostics.Process.Start(filename);
-        }
-
-        static void OnProvisionImage(object sender, ProvisionImageEventArgs e)
-        {
-            string filename = Path.GetFileName(e.ImageUrl.OriginalString);
-            if (!File.Exists("../../images/" + filename))
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            e.Provision(File.ReadAllBytes("../../images/" + filename));
         }
 
         static void AssertThatOpenXmlDocumentIsValid(WordprocessingDocument wpDoc)

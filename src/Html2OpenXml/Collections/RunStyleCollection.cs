@@ -22,9 +22,7 @@ namespace HtmlToOpenXml
 
 	sealed class RunStyleCollection : OpenXmlStyleCollectionBase
 	{
-		private HtmlDocumentStyle documentStyle;
-		private readonly static GetSequenceNumberHandler getTagOrderHandler = CreateTagOrderDelegate<RunProperties>();
-
+		private readonly HtmlDocumentStyle documentStyle;
 
 		internal RunStyleCollection(HtmlDocumentStyle documentStyle)
 		{
@@ -46,7 +44,7 @@ namespace HtmlToOpenXml
 			{
 				TagsAtSameLevel tagsOfSameLevel = en.Current.Value.Peek();
 				foreach (OpenXmlElement tag in tagsOfSameLevel.Array)
-					SetProperties(properties, tag.CloneNode(true));
+					properties.AddChild(tag.CloneNode(true));
 			}
 
 			if (this.DefaultRunStyle != null)
@@ -121,15 +119,6 @@ namespace HtmlToOpenXml
 					styleAttributes.Add(new FontSize() { Val = (font.Size.ValueInPoint * 2).ToString(CultureInfo.InvariantCulture) });
 			}
 		}
-
-        #endregion
-
-        #region GetTagOrder
-
-        protected override int GetTagOrder(OpenXmlElement element)
-        {
-            return (int) getTagOrderHandler.DynamicInvoke(element);
-        }
 
         #endregion
 
